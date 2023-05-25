@@ -1,0 +1,141 @@
+import React, { useState } from 'react';
+import Canvas from './canvas'
+
+function App() {
+  
+  let [mouseCoords] = useState({ x: 0, y: 0 });
+
+  let [click] = useState(false);
+
+  const backgroundImage = new Image();
+  backgroundImage.src = require('./waldo.jpeg');
+
+  const predraw = (context:any, canvas:any) => {
+    const { width, height } = context.canvas
+    context.clearRect(0, 0, width, height)
+  }
+
+  const draw = (ctx:CanvasRenderingContext2D, frameCount:number) => {
+    predraw(ctx, ctx.canvas);
+    dummy(ctx);
+  }
+
+  function handleCanvasMouseMove(x: any, y: any) {
+    mouseCoords = { 'x': x, 'y':y }
+  }
+
+  function handleCanvasClick(x: any, y: any) {
+    click = true
+  }
+  
+
+  class Spotlight {
+    constructor(public x: number, public y: number) {}
+  }  
+
+
+  function spotlights(): Spotlight[]{
+    return [
+      //new Spotlight(50, 50),
+      new Spotlight(200, 300),
+      new Spotlight(600, 200),
+      //new Spotlight(50, 800),
+    ]
+  }
+
+  function dummy1(context:any){
+    context.fillStyle = "red";
+    context.fillRect(100, 100, 200, 200);
+
+    var imageData = context.getImageData(100, 100, 200, 200);
+
+    context.putImageData(imageData, 400, 200);
+
+    context.clearRect(100, 100, 200, 200);
+  }
+
+
+  function dummy(context:any){
+    
+    //context.drawImage(backgroundImage, 0, 0, 1000, 1000);
+
+    let local_spotlights = spotlights();
+    //local_spotlights.push(new Spotlight(mouseCoords.x, mouseCoords.y) );
+    const RATIO = 100;
+    let variable = true;
+    if(variable){
+    
+      for (var spotlight of local_spotlights) {
+        
+        context.globalCompositeOperation = "source-over";
+        const gradient1 = context.createRadialGradient(spotlight.x, spotlight.y, 0, spotlight.x, spotlight.y, RATIO*0.9);
+        gradient1.addColorStop(0, "rgba(255, 255, 255, 0.5)");
+        gradient1.addColorStop(1, "rgba(0, 0, 0, 1)");
+  
+        context.globalCompositeOperation = "lighter";
+        context.beginPath();
+        context.fillStyle = gradient1;
+        context.moveTo(spotlight.x, spotlight.y);
+        context.arc(spotlight.x, spotlight.y, RATIO, 0, 2 * Math.PI);
+        context.globalAlpha = 0.9;
+        context.fill();
+      }
+    
+      // Spotligts Holes
+      context.beginPath();
+      
+
+      for (var spotlight of local_spotlights) {
+        context.globalCompositeOperation = "source-over";
+
+        context.fillStyle = "green";
+        context.moveTo(100, 100);
+        context.arc(100, 100, RATIO, 0, 2 * Math.PI);
+        context.fill();
+
+        // Shadow
+        context.globalCompositeOperation = "destination-out";
+        context.beginPath();
+        context.fillStyle = "black";
+        context.fillRect(0, 0, 100, 100);
+
+        // Move
+        var imageData = context.getImageData(0, 0, 200, 200);
+        context.putImageData(imageData, spotlight.x-100, spotlight.y-100);
+        // Clear
+        context.clearRect(0, 0, 200, 200);
+      }
+
+      context.globalCompositeOperation = "source-in";
+    // Background
+      context.fillStyle = "purple";
+      context.fillRect(0, 0, 1000, 1000);
+      context.fill();
+
+      //context.globalAlpha = 1.0;
+      //context.fill();
+
+
+
+    // WAR FOG
+    context.globalAlpha = 1.0;
+    context.globalCompositeOperation = "destination-over";
+    context.fillStyle = "black";
+    context.fillRect(0, 0, 1000, 1000);
+
+
+    }
+
+    // Restore
+    context.globalCompositeOperation = "source-over";
+    context.globalAlpha = 1.0;
+  }
+
+  return <Canvas draw={draw} options={{'context': '2d'}}
+          mouseMoveCallback={handleCanvasMouseMove}
+          clickCallback={handleCanvasClick}
+          />
+
+}
+
+export default App
