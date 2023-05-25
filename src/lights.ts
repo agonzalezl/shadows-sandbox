@@ -1,29 +1,4 @@
-import { Point, Segment, Vector } from "geomescript";
-
-class Spotlight {
-  constructor(public x: number, public y: number) {}
-}
-
-class Polygon {
-  constructor(public points: Point[]) {
-    this.points = points;
-  }
-
-  getSegments(): Segment[] {
-    const segments: Segment[] = [];
-    const numPoints = this.points.length;
-
-    for (let i = 0; i < numPoints; i++) {
-      const startPoint = this.points[i];
-      const endPoint = this.points[(i + 1) % numPoints];
-
-      const segment = new Segment(startPoint, endPoint);
-      segments.push(segment);
-    }
-
-    return segments;
-  }
-}
+import { Point, Segment, Vector, Circle, Polygon } from "geomescript";
 
 function calculateShadows(spotLight: Point, obstacles: Segment[]): Polygon[] {
   const polygons: Polygon[] = [];
@@ -65,7 +40,7 @@ function drawPolygon(
 
 function renderLightingEffects(
   context: CanvasRenderingContext2D,
-  spotlights: Spotlight[],
+  spotlights: Circle[],
   obstacles: Segment[]
 ) {
   // Spotligts Holes
@@ -98,14 +73,14 @@ function renderLightingEffects(
 
     individualctx.clearRect(0, 0, 1000, 1000);
 
-    individualctx.moveTo(spotlight.x, spotlight.y);
-    individualctx.arc(spotlight.x, spotlight.y, RATIO, 0, 2 * Math.PI);
+    individualctx.moveTo(spotlight.center.x, spotlight.center.y);
+    individualctx.arc(spotlight.center.x, spotlight.center.y, RATIO, 0, 2 * Math.PI);
 
     individualctx.globalAlpha = 1.0;
     individualctx.fill();
 
     individualctx.globalCompositeOperation = "destination-out";
-    let shadows = calculateShadows(new Point(spotlight.x, spotlight.y), obstacles);
+    let shadows = calculateShadows(new Point(spotlight.center.x, spotlight.center.y), obstacles);
 
     for(let shadow of shadows){
         drawPolygon(individualctx, shadow);
@@ -134,11 +109,11 @@ function renderLightingEffects(
 
     copyctx.globalCompositeOperation = "lighter";
     const gradient1 = copyctx.createRadialGradient(
-      spotlight.x,
-      spotlight.y,
+      spotlight.center.x,
+      spotlight.center.y,
       0,
-      spotlight.x,
-      spotlight.y,
+      spotlight.center.x,
+      spotlight.center.y,
       RATIO * 1.0
     );
     gradient1.addColorStop(0, "rgba(255, 255, 255, 1)");
@@ -146,13 +121,13 @@ function renderLightingEffects(
 
     copyctx.beginPath();
     copyctx.fillStyle = gradient1;
-    copyctx.moveTo(spotlight.x, spotlight.y);
-    copyctx.arc(spotlight.x, spotlight.y, RATIO, 0, 2 * Math.PI);
+    copyctx.moveTo(spotlight.center.x, spotlight.center.y);
+    copyctx.arc(spotlight.center.x, spotlight.center.y, RATIO, 0, 2 * Math.PI);
     context.globalAlpha = 0.4;
     copyctx.fill();
 
     copyctx.globalCompositeOperation = "destination-out";
-    let shadows = calculateShadows(new Point(spotlight.x, spotlight.y), obstacles);
+    let shadows = calculateShadows(spotlight.center, obstacles);
 
     for(let shadow of shadows){
         drawPolygon(copyctx, shadow);
@@ -173,4 +148,4 @@ function renderLightingEffects(
   context.globalAlpha = 1.0;
 }
 
-export { renderLightingEffects, Spotlight };
+export { renderLightingEffects };

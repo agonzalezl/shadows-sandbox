@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import Canvas from './canvas'
-import { Point, Segment, Polyline, Vector } from 'geomescript';
-import { renderLightingEffects, Spotlight } from './lights';
+import { Point, Segment, Circle } from 'geomescript';
+import { renderLightingEffects } from './lights';
 function App() {
   
   let [mouseCoords] = useState({ x: 0, y: 0 });
@@ -21,7 +21,7 @@ function App() {
 
     ctx.drawImage(backgroundImage, 0, 0, 1000, 1000);
     let spotlightList = spotlights();
-    spotlightList.push(new Spotlight(mouseCoords.x, mouseCoords.y));
+    spotlightList.push(new Circle(new Point(mouseCoords.x, mouseCoords.y), 0));
     renderLightingEffects(ctx, spotlightList,  obstacles());
   }
 
@@ -30,13 +30,13 @@ function App() {
   }
 
 
-function spotlights(): Spotlight[]{
+function spotlights(): Circle[]{
   return [
-      new Spotlight(100, 250),
-      new Spotlight(50, 50),
-      new Spotlight(200, 300),
-      new Spotlight(900, 700), 
-      new Spotlight(50, 800),
+      new Circle(new Point(100, 250), 0),
+      new Circle(new Point(50, 50), 0),
+      new Circle(new Point(200, 300), 0),
+      new Circle(new Point(900, 700), 0), 
+      new Circle(new Point(50, 800), 0),
   ]
 }
 
