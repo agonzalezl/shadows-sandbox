@@ -1,0 +1,14 @@
+{
+  "files": {
+    "main.css": "/shadows-sandbox/static/css/main.85d05401.css",
+    "main.js": "/shadows-sandbox/static/js/main.5e771538.js",
+    "static/media/waldo.jpeg": "/shadows-sandbox/static/media/waldo.dcf800bd3f4a239521f2.jpeg",
+    "index.html": "/shadows-sandbox/index.html",
+    "main.85d05401.css.map": "/shadows-sandbox/static/css/main.85d05401.css.map",
+    "main.5e771538.js.map": "/shadows-sandbox/static/js/main.5e771538.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.85d05401.css",
+    "static/js/main.5e771538.js"
+  ]
+}
