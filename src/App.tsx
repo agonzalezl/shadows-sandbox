@@ -21,7 +21,7 @@ function App() {
 
     ctx.drawImage(backgroundImage, 0, 0, 1000, 1000);
     let spotlightList = spotlights();
-    spotlightList.push(new Circle(new Point(mouseCoords.x, mouseCoords.y), 0));
+    spotlightList.push(new Circle(new Point(mouseCoords.x, mouseCoords.y), 70));
     renderLightingEffects(ctx, spotlightList,  obstacles());
   }
 
@@ -32,11 +32,11 @@ function App() {
 
 function spotlights(): Circle[]{
   return [
-      new Circle(new Point(100, 250), 0),
-      new Circle(new Point(50, 50), 0),
-      new Circle(new Point(200, 300), 0),
-      new Circle(new Point(900, 700), 0), 
-      new Circle(new Point(50, 800), 0),
+      new Circle(new Point(100, 250), 70),
+      new Circle(new Point(50, 50), 70),
+      new Circle(new Point(200, 300), 70),
+      new Circle(new Point(900, 700), 70), 
+      new Circle(new Point(50, 800), 70),
   ]
 }
 
