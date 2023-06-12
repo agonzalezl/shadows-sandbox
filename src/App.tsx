@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import Canvas from './canvas'
 import { Point, Segment, Circle } from 'geomescript';
-import { renderLightingEffects } from './lights';
+import { renderLightingEffects, calculateShadows, SpotLight, Shadow } from './camera/misc/lights';
 function App() {
   
   let [mouseCoords] = useState({ x: 0, y: 0 });
@@ -21,8 +21,12 @@ function App() {
 
     ctx.drawImage(backgroundImage, 0, 0, 1000, 1000);
     let spotlightList = spotlights();
-    spotlightList.push(new Circle(new Point(mouseCoords.x, mouseCoords.y), 70));
-    renderLightingEffects(ctx, spotlightList,  obstacles());
+    spotlightList.push(new SpotLight(new Circle(new Point(mouseCoords.x, mouseCoords.y), 70)));
+
+    for(var spotlight of spotlightList){
+      spotlight.shadows = calculateShadows(spotlight, obstacles());
+    }
+    renderLightingEffects(ctx, spotlightList);
   }
 
   function handleCanvasMouseMove(x: any, y: any) {
@@ -30,13 +34,13 @@ function App() {
   }
 
 
-function spotlights(): Circle[]{
+function spotlights(): SpotLight[]{
   return [
-      new Circle(new Point(100, 250), 70),
-      new Circle(new Point(50, 50), 70),
-      new Circle(new Point(200, 300), 70),
-      new Circle(new Point(900, 700), 70), 
-      new Circle(new Point(50, 800), 70),
+      new SpotLight(new Circle(new Point(100, 250), 70)),
+      new SpotLight(new Circle(new Point(50, 50), 70)),
+      new SpotLight(new Circle(new Point(200, 300), 70)),
+      new SpotLight(new Circle(new Point(900, 700), 70)), 
+      new SpotLight(new Circle(new Point(50, 800), 70)),
   ]
 }
 

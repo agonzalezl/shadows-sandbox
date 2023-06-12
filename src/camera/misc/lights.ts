@@ -1,35 +1,46 @@
 import { Point, Segment, Vector, Circle, Polygon } from "geomescript";
-import { drawPolygon, drawCircle } from "./drawing";
+import { drawPolygon, drawCircle } from "../drawing";
 
-function calculateShadows(spotLight: Point, obstacles: Segment[]): Polygon[] {
-  const polygons: Polygon[] = [];
+function calculateShadows(
+  spotLight: SpotLight,
+  obstacles: Segment[]
+): Shadow[] {
+  const polygons: Shadow[] = [];
   for (var obstacle of obstacles) {
     polygons.push(calculateShadow(spotLight, obstacle));
   }
   return polygons;
 }
 
-function calculateShadow(spotLight: Point, obstacle: Segment): Polygon {
-  let v1 = Vector.fromPoints(spotLight, obstacle.start).scaled(1000);
+function calculateShadow(spotLight: SpotLight, obstacle: Segment): Shadow {
+  let v1 = Vector.fromPoints(spotLight.shape.center, obstacle.start).scaled(
+    1000
+  );
   let p1 = obstacle.start.translate(v1);
-  let v2 = Vector.fromPoints(spotLight, obstacle.end).scaled(1000);
+  let v2 = Vector.fromPoints(spotLight.shape.center, obstacle.end).scaled(1000);
   let p2 = obstacle.end.translate(v2);
-  return new Polygon([obstacle.start, obstacle.end, p2, p1]);
+  return new Shadow(new Polygon([obstacle.start, obstacle.end, p2, p1]));
+}
+
+class SpotLight {
+  constructor(public shape: Circle, public shadows: Shadow[] = []) {}
+}
+
+class Shadow {
+  constructor(public shape: Polygon) {}
 }
 
 function renderLightingEffects(
   context: CanvasRenderingContext2D,
-  spotlights: Circle[],
-  obstacles: Segment[]
+  spotlights: SpotLight[]
 ) {
-  renderSpotlights(context, spotlights, obstacles);
-  renderShiningEffect(context, spotlights, obstacles);
+  renderSpotlights(context, spotlights);
+  renderShiningEffect(context, spotlights);
 }
 
 function renderSpotlights(
   context: CanvasRenderingContext2D,
-  spotlights: Circle[],
-  obstacles: Segment[]
+  spotlights: SpotLight[]
 ) {
   let currentglobalCompositeOperation = context.globalCompositeOperation;
   // Temp canvas where all the spotlights will be drawn
@@ -56,16 +67,12 @@ function renderSpotlights(
       return;
     }
 
-    drawCircle(individualctx, spotlight.center, spotlight.radius);
+    drawCircle(individualctx, spotlight.shape.center, spotlight.shape.radius);
 
     individualctx.globalCompositeOperation = "destination-out";
-    let shadows = calculateShadows(
-      new Point(spotlight.center.x, spotlight.center.y),
-      obstacles
-    );
 
-    for (let shadow of shadows) {
-      drawPolygon(individualctx, shadow);
+    for (let shadow of spotlight.shadows) {
+      drawPolygon(individualctx, shadow.shape);
     }
 
     allShadowsctx.globalCompositeOperation = "source-over";
@@ -87,8 +94,7 @@ function renderSpotlights(
 
 function renderShiningEffect(
   context: CanvasRenderingContext2D,
-  spotlights: Circle[],
-  obstacles: Segment[]
+  spotlights: SpotLight[]
 ) {
   let currentglobalCompositeOperation = context.globalCompositeOperation;
   let copycanvas = context.canvas.cloneNode() as HTMLCanvasElement;
@@ -109,16 +115,14 @@ function renderShiningEffect(
     copyctx.globalCompositeOperation = "lighter";
     drawCircle(
       copyctx,
-      spotlight.center,
-      spotlight.radius * 1.5,
-      generateShiningGradient(copyctx, spotlight)
+      spotlight.shape.center,
+      spotlight.shape.radius * 1.5,
+      generateShiningGradient(copyctx, spotlight.shape)
     );
 
     copyctx.globalCompositeOperation = "destination-out";
-    let shadows = calculateShadows(spotlight.center, obstacles);
-
-    for (let shadow of shadows) {
-      drawPolygon(copyctx, shadow);
+    for (let shadow of spotlight.shadows) {
+      drawPolygon(copyctx, shadow.shape);
     }
 
     context.globalCompositeOperation = "lighter";
@@ -146,4 +150,4 @@ function generateShiningGradient(
   return gradient1;
 }
 
-export { renderLightingEffects };
+export { renderLightingEffects, SpotLight, Shadow, calculateShadows };

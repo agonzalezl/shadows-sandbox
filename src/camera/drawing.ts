@@ -1,7 +1,7 @@
 import { Segment, Point, Polygon } from "geomescript";
 
 function drawCircle(
-  ctx: any,
+  ctx: CanvasRenderingContext2D,
   point: Point,
   size: number,
   fillStyle: string | CanvasGradient = "#00FF00"
@@ -13,7 +13,7 @@ function drawCircle(
 }
 
 function drawSegment(
-  ctx: any,
+  ctx: CanvasRenderingContext2D,
   segment: Segment,
   color = "#FF0000",
   thickness: number = 1
