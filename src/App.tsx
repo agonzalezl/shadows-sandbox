@@ -1,15 +1,33 @@
 import React, { useState } from 'react';
 import Canvas from './canvas'
 import { Point, Segment, Circle } from 'geomescript';
-import { renderLightingEffects, calculateShadows, SpotLight, Shadow } from './camera/misc/lights';
+import { GameData } from './GameData';
+import { Camera } from './camera/camera';
 function App() {
   
+  const backgroundImage = new Image();
+  backgroundImage.src = require('./waldo.jpeg');
+
+  let gameData = new GameData(
+    [
+      new Circle(new Point(100, 250), 70),
+      new Circle(new Point(50, 50), 70),
+      new Circle(new Point(200, 300), 70),
+      new Circle(new Point(900, 700), 70), 
+      new Circle(new Point(50, 800), 70),
+  ],
+  new Circle(new Point(100, 250), 70),
+  [
+    new Segment(new Point(0, 200), new Point(200, 200)),
+    new Segment(new Point(0, 100), new Point(200, 200))
+  ],
+  backgroundImage
+  );
   let [mouseCoords] = useState({ x: 0, y: 0 });
 
   let [click] = useState(false);
 
-  const backgroundImage = new Image();
-  backgroundImage.src = require('./waldo.jpeg');
+
 
   const predraw = (context:any, canvas:any) => {
     const { width, height } = context.canvas
@@ -17,39 +35,18 @@ function App() {
   }
 
   const draw = (ctx:CanvasRenderingContext2D, frameCount:number) => {
+    let initialCamera = new Camera(new Point(0, 1000), 1000, 1000, ctx);
+
     predraw(ctx, ctx.canvas);
 
-    ctx.drawImage(backgroundImage, 0, 0, 1000, 1000);
-    let spotlightList = spotlights();
-    spotlightList.push(new SpotLight(new Circle(new Point(mouseCoords.x, mouseCoords.y), 70)));
+    gameData.player = new Circle(new Point(mouseCoords.x, mouseCoords.y), 70);
+    initialCamera.render(gameData);
 
-    for(var spotlight of spotlightList){
-      spotlight.shadows = calculateShadows(spotlight, obstacles());
-    }
-    renderLightingEffects(ctx, spotlightList);
   }
 
   function handleCanvasMouseMove(x: any, y: any) {
     mouseCoords = { 'x': x, 'y':y }
   }
-
-
-function spotlights(): SpotLight[]{
-  return [
-      new SpotLight(new Circle(new Point(100, 250), 70)),
-      new SpotLight(new Circle(new Point(50, 50), 70)),
-      new SpotLight(new Circle(new Point(200, 300), 70)),
-      new SpotLight(new Circle(new Point(900, 700), 70)), 
-      new SpotLight(new Circle(new Point(50, 800), 70)),
-  ]
-}
-
-function obstacles(): Segment[]{
-  return [
-    new Segment(new Point(0, 200), new Point(200, 200)),
-    new Segment(new Point(0, 100), new Point(200, 200))
-  ];
-}
 
   function handleCanvasClick(x: any, y: any) {
     click = true

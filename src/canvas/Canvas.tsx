@@ -15,7 +15,6 @@ interface CanvasProps {
 const Canvas: FC<CanvasProps> = (props) => {
   const { draw, options, mouseMoveCallback, clickCallback, ...rest } = props;
   const canvasRef = useCanvas(draw, options, {mouseMoveCallback, clickCallback});
-  console.log("Init!!!")
   return (
     <canvas className="my-canvas" width="1000" height="1000" ref={canvasRef} {...rest} />
   );

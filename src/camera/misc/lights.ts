@@ -1,5 +1,13 @@
-import { Point, Segment, Vector, Circle, Polygon } from "geomescript";
+import { Segment, Vector, Circle, Polygon } from "geomescript";
 import { drawPolygon, drawCircle } from "../drawing";
+
+class SpotLight {
+  constructor(public shape: Circle, public shadows: Shadow[] = []) {}
+}
+
+class Shadow {
+  constructor(public shape: Polygon) {}
+}
 
 function calculateShadows(
   spotLight: SpotLight,
@@ -20,14 +28,6 @@ function calculateShadow(spotLight: SpotLight, obstacle: Segment): Shadow {
   let v2 = Vector.fromPoints(spotLight.shape.center, obstacle.end).scaled(1000);
   let p2 = obstacle.end.translate(v2);
   return new Shadow(new Polygon([obstacle.start, obstacle.end, p2, p1]));
-}
-
-class SpotLight {
-  constructor(public shape: Circle, public shadows: Shadow[] = []) {}
-}
-
-class Shadow {
-  constructor(public shape: Polygon) {}
 }
 
 function renderLightingEffects(
