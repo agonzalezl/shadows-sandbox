@@ -1,14 +1,14 @@
 {
   "files": {
     "main.css": "/shadows-sandbox/static/css/main.85d05401.css",
-    "main.js": "/shadows-sandbox/static/js/main.db7c9ac0.js",
+    "main.js": "/shadows-sandbox/static/js/main.46510416.js",
     "static/media/waldo.jpeg": "/shadows-sandbox/static/media/waldo.dcf800bd3f4a239521f2.jpeg",
     "index.html": "/shadows-sandbox/index.html",
     "main.85d05401.css.map": "/shadows-sandbox/static/css/main.85d05401.css.map",
-    "main.db7c9ac0.js.map": "/shadows-sandbox/static/js/main.db7c9ac0.js.map"
+    "main.46510416.js.map": "/shadows-sandbox/static/js/main.46510416.js.map"
   },
   "entrypoints": [
     "static/css/main.85d05401.css",
-    "static/js/main.db7c9ac0.js"
+    "static/js/main.46510416.js"
   ]
 }
