@@ -3,6 +3,7 @@ import { drawCircle, drawSegment } from "./drawing";
 import { CameraBase } from "./model";
 import {
   SpotLight,
+  Shadow,
   calculateShadows,
   renderLightingEffects,
 } from "./misc/lights";
@@ -23,7 +24,7 @@ class Camera extends CameraBase {
     this.ctx.drawImage(gameData.backgroundImage, 0, 0, 1000, 1000);
     renderLightingEffects(
       this.ctx,
-      generateSpotlightsAndShadows(
+      this.generateSpotlightsAndShadows(
         gameData.spotlights.concat(gameData.player),
         gameData.obstacles
       )
@@ -59,19 +60,23 @@ class Camera extends CameraBase {
       thickness
     );
   }
-}
 
-function generateSpotlightsAndShadows(
-  circleList: Circle[],
-  segment: Segment[]
-): SpotLight[] {
-  let spotLight = [];
-  for (var spotlightCircle of circleList) {
-    let spotlight = new SpotLight(spotlightCircle);
-    spotlight.shadows = calculateShadows(spotlight, segment);
-    spotLight.push(spotlight);
+  generateSpotlightsAndShadows(
+    circleList: Circle[],
+    segment: Segment[]
+  ): SpotLight[] {
+    let spotLight = [];
+    for (var circle of circleList) {
+      let spotlight = new SpotLight(circle);
+      let shadows = calculateShadows(spotlight, segment);
+      spotlight.shadows = shadows.map(
+        (shadow) => new Shadow(this.transformCoordinates(shadow.shape))
+      );
+      spotlight.shape = this.transformCoordinates(circle);
+      spotLight.push(spotlight);
+    }
+    return spotLight;
   }
-  return spotLight;
 }
 
 export { Camera };

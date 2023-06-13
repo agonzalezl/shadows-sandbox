@@ -1,4 +1,4 @@
-import { Point } from "geomescript";
+import { Point, Circle, Polygon, Segment } from "geomescript";
 
 class CameraBase {
   constructor(
@@ -24,8 +24,35 @@ class CameraBase {
     );
   }
 
-  transformCoordinates(point: Point): Point {
-    return this.canvasCoordinates(this.cameraCoordinates(point));
+  transformCoordinates(point: Point): Point;
+  transformCoordinates(circle: Circle): Circle;
+  transformCoordinates(polygon: Polygon): Polygon;
+  transformCoordinates(segment: Segment): Segment;
+  transformCoordinates(
+    shape: Point | Circle | Polygon | Segment
+  ): Point | Circle | Polygon | Segment {
+    if ("x" in shape && "y" in shape) {
+      return this.canvasCoordinates(this.cameraCoordinates(shape));
+    }
+
+    if ("center" in shape && "radius" in shape) {
+      return new Circle(this.transformCoordinates(shape.center), shape.radius);
+    }
+
+    if ("points" in shape) {
+      return new Polygon(
+        shape.points.map((point) => this.transformCoordinates(point))
+      );
+    }
+
+    if ("start" in shape && "end" in shape) {
+      return new Segment(
+        this.transformCoordinates(shape.start),
+        this.transformCoordinates(shape.end)
+      );
+    }
+
+    return shape;
   }
 
   // Used for example to see which map coordinates are you pointing to with the mouse
